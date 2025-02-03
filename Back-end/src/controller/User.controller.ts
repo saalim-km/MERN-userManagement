@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { IUser } from "../interface/User.interface.js";
 import { IUserService } from "../service/user/IUser.service.js";
 import { CreateJwt } from "../utils/createJwt.js";
+import { HttpStatus } from "../utils/statusCode.js";
 
 export class UserController {
     private userService : IUserService;
@@ -15,9 +16,11 @@ export class UserController {
         try {
             const user : IUser = req.body;
             const newUser = await this.userService.createUser(user);
-            res.status(201).json(newUser);
+            if(!newUser) return res.status(HttpStatus.BAD_REQUEST).json({success : false , message : "No User found !!"});
+
+            return res.status(HttpStatus.OK).json({success : true , message : "user registeration successfull"});
         } catch (error : any) {
-            console.log(error);
+            console.log(error );
             res.status(400).json({message : error.message});
         }
     }
@@ -27,31 +30,38 @@ export class UserController {
             const { email, password } = req.body;
     
             if (!email || !password) {
-                throw new Error("Email and password are required");
+                console.log("pass error")
+                return res.status(HttpStatus.BAD_REQUEST || 400).json({success : false , message : "Email and password are required"})
             }
     
             const user = await this.userService.findByEmail(email);
             if (!user) {
-                throw new Error("User not found");
+                console.log("user error")
+                return res.status(HttpStatus.BAD_REQUEST || 400).json({success : false , message : "user not found"});
             }
     
             const isMatch = await this.userService.comparePassword(password, user.password);
             if (!isMatch) {
-                throw new Error("Password is incorrect");
+                console.log("ooomb myre")
+                return res.status(HttpStatus.BAD_REQUEST || 400).json({success : false , message : "Password is incorrect"});
             }
     
-            this.createJwt.createToken(res, user._id?.toString() || "");
-            res.status(200).json({ message: "Login successful" });
-        } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "An error occurred" });
+            const  {refreshToken , accessToken} = await this.createJwt.createToken(res, user._id?.toString() || "");
+            console.log(refreshToken , accessToken)
+            res.status(HttpStatus.OK).json({success :true ,  message: "Login successful", user: user , token : {refresh : refreshToken , access : accessToken}});
+        } catch (error : any) {
+            console.log(error.message);
+            console.log({success : false , message : error.message})
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({success : false , message : error.message || "an error occured in login controller"});
         }
     }
 
     public async logout(req : Request , res : Response) {
         try {
             res.clearCookie('jwt')
-        } catch (error) {
-            console.log(error)
+        } catch (error : any) {
+            console.log(error );
+            res.status(400).json({message : error.message});
         }
     }
 
@@ -62,8 +72,9 @@ export class UserController {
                 return res.status(404).json({message : "User not found"});
             }
             res.status(200).json({user : user});
-        } catch (error) {
-            res.status(400).json({message : error});
+        } catch (error : any) {
+            console.log(error );
+            res.status(400).json({message : error.message});
         }
     }
 
@@ -72,9 +83,9 @@ export class UserController {
             const userId = req.user?.toString() || "";
             const updatedUser = await this.userService.updateUser(userId , req.body);
             res.status(200).json(updatedUser);
-        } catch (error) {
-            console.log(error);
-            res.status(400).json({message : error});
+        } catch (error : any) {
+            console.log(error );
+            res.status(400).json({message : error.message});
         }
     }
 

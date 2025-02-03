@@ -2,17 +2,28 @@ import Jwt from "jsonwebtoken";
 import { Response } from "express";
 
 export class CreateJwt {
-    public createToken = async (res : Response,userId : string) => {
-        const secret = process.env.JWT_SECRET;
-        if(!secret) {
-            throw new Error("No secret provided");
+    public createToken = async (res: Response, userId: string) => {
+        console.log("Creating tokens...");
+
+        const accessSecret = process.env.ACCESS_TOKEN_SECRET;
+        const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
+
+        if (!accessSecret || !refreshSecret) {
+            throw new Error("Secrets are missing!");
         }
-        const token = await Jwt.sign({userId : userId} , secret , {expiresIn : "30d"});
-        res.cookie('jwt',token,{
-            httpOnly : true,
-            secure : process.env.NODE_ENV === "production",
-            sameSite : "strict",
-            maxAge : 30 * 24 * 60 * 1000
-        })
-    }
+
+        // Generate Access Token (expires in 15 min)
+        const accessToken = Jwt.sign({ userId }, accessSecret, { expiresIn: "15m" });
+
+        // Generate Refresh Token (expires in 30 days)
+        const refreshToken = Jwt.sign({ userId }, refreshSecret, { expiresIn: "30d" });
+
+        console.log("Access Token:", accessToken);
+        console.log("Refresh Token:", refreshToken);
+
+        return {
+            refreshToken,
+            accessToken
+        }
+    };
 } 

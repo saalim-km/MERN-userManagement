@@ -16,12 +16,14 @@ export class UserRoute {
     public setRoutes() {
         console.log("user router here");
 
-        this.router.post("/signup" , (req : Request , res : Response)=>
-            this.userController.signUp(req,res)
+        this.router.post("/signup" , async (req : Request , res : Response)=>{
+            await this.userController.signUp(req,res)
+            }
         );
 
-        this.router.post("/login" , (req : Request , res : Response)=>
-            this.userController.login(req,res)
+        this.router.post("/login" , async (req : Request , res : Response)=>{
+            await this.userController.login(req,res)
+            }
         );
 
         this.router.get("/logout" , (req : Request , res : Response)=>

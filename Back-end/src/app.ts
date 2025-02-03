@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { UserRoute } from "./route/User.route.js";
 import { AdminRoute } from "./route/Admin.route.js";
 import { IUser } from "./interface/User.interface.js";
+import cors from "cors";
 
 import { UserController } from "./controller/User.controller.js";
 import { UserService } from "./service/user/User.services.js";
@@ -17,7 +18,13 @@ declare module "express-serve-static-core" {
     interface Request {
       user?: IUser & Document;
     }
-  }
+}
+
+const corsOption = {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
+    credentials: true,
+}
 
 export class App {
     public app : Application;
@@ -30,6 +37,7 @@ export class App {
     }
 
     private setMiddleware() {
+        this.app.use(cors(corsOption))
         this.app.use(express.json());
         this.app.use(express.urlencoded({extended : true}));
         this.app.use(cookieParser());

@@ -17,7 +17,6 @@ export class UserService implements IUserService {
         if(!user.email) throw new Error("email is required");
         if(!user.password) throw new Error("password is required");
         if(!user.name) throw new Error("name is required");
-        if(!user.profileImage) throw new Error("profile image is required");
 
         const isUserExist = await this.userRepository.findUserByEmail(user.email);
         if(isUserExist) {
