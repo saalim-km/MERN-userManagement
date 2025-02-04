@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import userModel from "../models/User.model.js";
+import { HttpStatus } from "../utils/statusCode.js";
+import { JwtPayload } from "../interface/JwtPayload.interface.js";
+import { RequestHandler } from "express";
+
+
 
 export class UserAuth {
   
@@ -9,26 +14,36 @@ export class UserAuth {
       const secret = process.env.REFRESH_TOKEN_SECRET;
       if (!secret) throw new Error("REFRESH_TOKEN_SECRET is missing");
   
-      const token = req.headers.authorization?.split(' ')[1];
-      console.log(req.cookies)
-      if (!token) {
-        res.status(401).json({ message: "No token provided" });
-        return
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "No access token provided" });
+
+      } else {
+
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.decode(token) as JwtPayload | null;
+        console.log("token",token);
+        console.log("decoded token",decoded);
+        
+        if (!decoded || decoded.expiresIn * 1000 < Date.now()) {
+          res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "Access token expired" });
+
+        } else {
+
+          const decode = jwt.verify(token, secret) as { userId: string };
+          req.user = await userModel.findById(decode.userId).select("-password");
+  
+          if (!req.user) {
+            res.status(404).json({ message: "User not found" });
+          } else {
+            return next(); // Ensure `next()` is called only when valid
+          }
+        }
       }
-  
-      const decode = jwt.verify(token, secret) as { userId: string };
-      req.user = await userModel.findById(decode.userId).select("-password");
-  
-      if (!req.user) {
-        res.status(404).json({ message: "User not found" });
-        return;
-      }
-  
-      next();
     } catch (error) {
       console.error(error);
-      next(error); // Pass the error to the next middleware
+      next(error);
     }
-  };
+  };  
 
 }

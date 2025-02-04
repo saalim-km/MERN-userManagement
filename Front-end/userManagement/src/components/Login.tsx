@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { userLogin, userRegister } from "../api/userService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/userSlice";
 import { showErrorToast, showSuccessToast } from "../utils/customToast";
+import { useNavigate } from "react-router";
+
 
 const Login = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -27,8 +29,8 @@ const Login = () => {
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.push("Invalid email address");
     }
-    if (formData.password.length < 8) {
-      newErrors.push("Password must be at least 8 characters");
+    if (formData.password.length < 4) {
+      newErrors.push("Password must be at least 4 characters");
     }
 
     if (!isLogin && formData.password !== formData.confirmPassword) {
@@ -68,6 +70,7 @@ const Login = () => {
                   profileImg: user.profileImage,
                 };
                 dispatch(login(userCredentials));
+                navigate("/")
               } else {
                 showErrorToast(loginRes.message);
               }
@@ -75,8 +78,9 @@ const Login = () => {
           }else {
             const {confirmPassword , ...userData} = formData;
             const signupRes = await userRegister(userData);
+            console.log("signup result from api service",signupRes);
             if(signupRes){
-                console.log("account created for user  : ",signupRes)
+              setIsLogin(true);
             }
           }
         } catch (error: any) {

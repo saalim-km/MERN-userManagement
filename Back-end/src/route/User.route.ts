@@ -33,6 +33,10 @@ export class UserRoute {
         this.router.get("/profile", this.userAuth.protect, async (req: Request, res: Response) => {
             await this.userController.currentUserProfile(req, res);
         });
+
+        this.router.post("/auth/refresh", (req : Request , res : Response)=>
+            this.userController.newAccessToken(req , res)
+        );
     }
 
     public getRouter() : Router {

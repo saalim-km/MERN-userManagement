@@ -21,7 +21,7 @@ export class UserController {
             return res.status(HttpStatus.OK).json({success : true , message : "user registeration successfull"});
         } catch (error : any) {
             console.log(error );
-            res.status(400).json({message : error.message});
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({success : false , message : error.message});
         }
     }
 
@@ -31,19 +31,19 @@ export class UserController {
     
             if (!email || !password) {
                 console.log("pass error")
-                return res.status(HttpStatus.BAD_REQUEST || 400).json({success : false , message : "Email and password are required"})
+                return res.status(HttpStatus.UNAUTHORIZED || 401).json({success : false , message : "Email and password are required"})
             }
     
             const user = await this.userService.findByEmail(email);
             if (!user) {
                 console.log("user error")
-                return res.status(HttpStatus.BAD_REQUEST || 400).json({success : false , message : "user not found"});
+                return res.status(HttpStatus.UNAUTHORIZED || 400).json({success : false , message : "user not found"});
             }
     
             const isMatch = await this.userService.comparePassword(password, user.password);
             if (!isMatch) {
                 console.log("ooomb myre")
-                return res.status(HttpStatus.BAD_REQUEST || 400).json({success : false , message : "Password is incorrect"});
+                return res.status(HttpStatus.UNAUTHORIZED || 400).json({success : false , message : "Password is incorrect"});
             }
     
             const  {refreshToken , accessToken} = await this.createJwt.createToken(res, user._id?.toString() || "");
@@ -89,4 +89,14 @@ export class UserController {
         }
     }
 
+    public async newAccessToken(req : Request , res : Response){
+        try {  
+            const {refreshToken} = req.body;
+            const newAccessToken = await this.createJwt.refreshAccess(refreshToken);
+            console.log(newAccessToken);
+        } catch (error : any) {
+            console.log(error);
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({success : false , message : error.message})
+        }
+    }
 }
