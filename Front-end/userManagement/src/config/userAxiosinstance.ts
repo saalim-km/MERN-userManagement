@@ -1,7 +1,7 @@
-import axios from 'axios'
+import axios, { InternalAxiosRequestConfig, isAxiosError } from 'axios'
 
 const userAxiosInstance = axios.create({
-    baseURL: "http://localhost:3006/user",
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true
 })
 
@@ -18,41 +18,50 @@ const newAccessToken = async()=> {
         console.log(error)
     }
 }
+
 userAxiosInstance.interceptors.request.use(
-    async (config : any)=> {
+    async (config : InternalAxiosRequestConfig)=> {
         const refreshToken = localStorage.getItem("refresh");
         const accessToken = localStorage.getItem("access");
 
         if(accessToken){
+            config.headers = config.headers || {};
             config.headers["Authorization"] = `Bearer ${accessToken}`;
         }
 
         if (refreshToken) {
-            config.headers["x-refresh-token"] = refreshToken;  // Send refresh token in a custom header
-        
+            config.headers = config.headers || {};
+            config.headers["x-refresh-token"] = refreshToken;
         }
         return config;
     },
-    (error: any)=> Promise.reject(error)
+    (error: unknown)=> {
+        if(isAxiosError(error)) {
+            Promise.reject(error)
+        }
+    }
 );
 
 userAxiosInstance.interceptors.response.use(
     (response)=> response,
     async (error)=> {
         const originalRequest = error.config;
-
-        if(error.response?.status == 401 && originalRequest._retry){
+        console.log("hi hoooy",error)
+        if(error?.status == 401 && !originalRequest._retry &&error.response?.data?.message == "Access token expired"){
             originalRequest._retry = true;
 
             try {
+                console.log("jwt expire aayi ")
                 const accessToken = await newAccessToken();
                 console.log("accesstoken",accessToken);
-            } catch (error : any) {
-                console.log(error.response.data.message)
+            } catch (error : unknown) {
+                if(isAxiosError(error) && error.response) {
+                    console.log(error.response.data.message)
+                }
             }
         }
 
-        return error;
+        return Promise.reject(error);
     }
 )
 

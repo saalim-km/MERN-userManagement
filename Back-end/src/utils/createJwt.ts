@@ -16,7 +16,7 @@ export class CreateJwt {
 
     // Generate Access Token (expires in 15 min)
     const accessToken = Jwt.sign({ userId }, accessSecret, {
-      expiresIn: "10s",
+      expiresIn: "5s",
     });
 
     // Generate Refresh Token (expires in 30 days)
@@ -55,5 +55,6 @@ export class CreateJwt {
     } catch (error: any) {
       console.log(error.message);
     }
-  };
+  }
+
 }

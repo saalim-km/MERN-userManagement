@@ -9,27 +9,27 @@ import { RequestHandler } from "express";
 
 export class UserAuth {
   
-  public protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  public protect = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const secret = process.env.REFRESH_TOKEN_SECRET;
+      const secret = process.env.ACCESS_TOKEN_SECRET;
       if (!secret) throw new Error("REFRESH_TOKEN_SECRET is missing");
   
       const authHeader = req.headers.authorization;
+      console.log("auth header vann : ",authHeader)
       if (!authHeader) {
         res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "No access token provided" });
 
       } else {
-
         const token = authHeader.split(" ")[1];
         const decoded = jwt.decode(token) as JwtPayload | null;
-        console.log("token",token);
-        console.log("decoded token",decoded);
-        
-        if (!decoded || decoded.expiresIn * 1000 < Date.now()) {
+        console.log("token : ",token);
+        console.log("decoded token : ",decoded);
+
+        if (decoded && decoded?.exp * 1000 < Date.now()) {
+          console.log("expire aayin thoonanu")
           res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "Access token expired" });
-
-        } else {
-
+        }else{
+          console.log("expire aayitilla")
           const decode = jwt.verify(token, secret) as { userId: string };
           req.user = await userModel.findById(decode.userId).select("-password");
   

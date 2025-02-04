@@ -6,6 +6,11 @@ export interface RegisterUser  {
     confirmPassword ?: string,
 }   
 
+export interface UpdateUser {
+    name : string,
+    profileImage : string,
+}
+
 export interface loginUser {
     email : string,
     password : string,

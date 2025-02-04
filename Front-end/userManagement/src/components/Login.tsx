@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { userLogin, userRegister } from "../api/userService";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { login } from "../redux/userSlice";
 import { showErrorToast, showSuccessToast } from "../utils/customToast";
 import { useNavigate } from "react-router";
@@ -41,7 +41,7 @@ const Login = () => {
     return newErrors.length === 0;
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -49,7 +49,7 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e : React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (validateForm()) {
@@ -76,16 +76,19 @@ const Login = () => {
               }
             }
           }else {
-            const {confirmPassword , ...userData} = formData;
+            const { confirmPassword ,...userData} = formData;
+            console.log(`comfirm password removed ${confirmPassword}`)
             const signupRes = await userRegister(userData);
             console.log("signup result from api service",signupRes);
             if(signupRes){
               setIsLogin(true);
             }
           }
-        } catch (error: any) {
-          console.log(error);
-          showErrorToast(error.message);
+        } catch (error: unknown) {
+          if(error instanceof Error){
+            console.log(error);
+            showErrorToast(error.message);
+          }
         }
       }
       submitForm();
@@ -180,7 +183,7 @@ const Login = () => {
           )}
           <button
             type="submit"
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="cursor-pointer w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             {isLogin ? "Login" : "Sign Up"}
           </button>
@@ -188,7 +191,7 @@ const Login = () => {
         <div className="mt-4 text-center">
           <button
             onClick={toggleMode}
-            className="text-sm text-indigo-600 hover:text-indigo-500"
+            className="cursor-pointer text-sm text-black hover:text-gray-400"
           >
             {isLogin
               ? "Need an account? Sign Up"

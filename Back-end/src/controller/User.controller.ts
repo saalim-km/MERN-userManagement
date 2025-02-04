@@ -15,6 +15,7 @@ export class UserController {
     public async signUp(req : Request , res : Response) {
         try {
             const user : IUser = req.body;
+            console.log(user)
             const newUser = await this.userService.createUser(user);
             if(!newUser) return res.status(HttpStatus.BAD_REQUEST).json({success : false , message : "No User found !!"});
 
@@ -81,9 +82,11 @@ export class UserController {
     public async updateUserProfile(req : Request , res : Response) {
         try {
             const userId = req.user?.toString() || "";
-            const updatedUser = await this.userService.updateUser(userId , req.body);
-            res.status(200).json(updatedUser);
+            console.log("user id kittiyada",userId);
+            // const updatedUser = await this.userService.updateUser(userId , req.body);
+            // res.status(200).json(updatedUser);
         } catch (error : any) {
+            console.log("eda evada vann")
             console.log(error );
             res.status(400).json({message : error.message});
         }
@@ -91,6 +94,8 @@ export class UserController {
 
     public async newAccessToken(req : Request , res : Response){
         try {  
+            console.log("in  controlller")
+            console.log(object)
             const {refreshToken} = req.body;
             const newAccessToken = await this.createJwt.refreshAccess(refreshToken);
             console.log(newAccessToken);

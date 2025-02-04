@@ -34,6 +34,10 @@ export class UserRoute {
             await this.userController.currentUserProfile(req, res);
         });
 
+        this.router.post("/update", this.userAuth.protect , async (req : Request , res : Response)=> {
+            await this.userController.updateUserProfile(req,res);
+        })
+
         this.router.post("/auth/refresh", (req : Request , res : Response)=>
             this.userController.newAccessToken(req , res)
         );
