@@ -4,6 +4,7 @@ import userModel from "../models/User.model.js";
 import { HttpStatus } from "../utils/statusCode.js";
 import { JwtPayload } from "../interface/JwtPayload.interface.js";
 import { RequestHandler } from "express";
+import mongoose from "mongoose";
 
 
 
@@ -31,12 +32,14 @@ export class UserAuth {
         }else{
           console.log("expire aayitilla")
           const decode = jwt.verify(token, secret) as { userId: string };
-          req.user = await userModel.findById(decode.userId).select("-password");
+          const userId = new mongoose.Types.ObjectId(decode.userId);
+          console.log(userId);
+          req.user = userId;
   
           if (!req.user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(HttpStatus.UNAUTHORIZED).json({ message: "User not found" });
           } else {
-            return next(); // Ensure `next()` is called only when valid
+            return next();
           }
         }
       }

@@ -12,7 +12,7 @@ export class AdminRepository implements IAdminRepository {
     }
 
     async findAllUsers(): Promise<IUser[]> {
-        return userModel.find({isAdmin : {$ne : false}});
+        return userModel.find({isAdmin : {$ne : true}}).sort({updatedAt : -1});
     }
 
     async deleteUserById(userId: string): Promise<IUser | null> {
@@ -21,6 +21,10 @@ export class AdminRepository implements IAdminRepository {
     
     async findUsers(user: Partial<IUser>): Promise<IUser[]> {
         return await userModel.find(user , {isAdmin : {$ne : false}});
+    }
+
+    async findUserById(userId: string): Promise<IUser | null> {
+        return await userModel.findById(userId);
     }
 
     async findUserByEmail(email: string): Promise<IUser | null> {

@@ -1,11 +1,13 @@
-import userAxiosInstance from "../config/userAxiosinstance";
+import {userAxiosInstance} from "../config/axiosInstance";
 import {
   RegisterUser,
   UpdateUser,
   loginUser,
 } from "../interface/userInterface";
+
+
 import { showSuccessToast } from "../utils/customToast";
-import cloudAxiosInstance from "../config/cloudAxiosInstance";
+import {cloudAxiosInstance} from "../config/axiosInstance";
 import { handleError } from "../utils/errorHandler";
 
 const userRegister = async (userData: RegisterUser) => {
@@ -28,8 +30,8 @@ const userLogin = async (credentials: loginUser) => {
     console.log(`login successfully ${res.data}`);
 
     const { access, refresh } = res.data.token;
-    localStorage.setItem("access", access);
-    localStorage.setItem("refresh", refresh);
+    localStorage.setItem("userAccess", access);
+    localStorage.setItem("userRefresh", refresh);
     return res.data;
   } catch (error: unknown) {
     handleError(error);
@@ -48,9 +50,24 @@ const uploadImage = async (formData: FormData) => {
 
 const updateUserProfile = async (userData: Partial<UpdateUser>) => {
   try {
+    console.log("update user profile api")
     const res = await userAxiosInstance.post("/update", userData);
+    console.log("user update aaayi : ",res)
+
+    const newData = {
+      userName : res.data.user.name,
+      profileImg : res.data.user.profileImage,
+      email : res.data.user.email
+    }
+
+    console.log(newData)
+    showSuccessToast("Profile updated.")
+    return newData;
   } catch (error) {
     handleError(error);
   }
 };
+
+
+
 export { userRegister, userLogin, uploadImage, updateUserProfile };

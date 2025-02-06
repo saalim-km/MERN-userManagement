@@ -5,7 +5,7 @@ export interface IAminService {
     deleteUser(userId : string) : Promise<IUser | null>;
     getUsers() : Promise<IUser[]>;
     searchUsers(query: Partial<IUser>): Promise<IUser[]>;
-    userExists(email: string): Promise<boolean>;
-    findUser(email : string) : Promise<IUser | null>;
+    userExists(email: string): Promise<IUser | null>;
+    findUser(userId : string) : Promise<IUser | null>;
     comparePassword(password : string , passInDb : string) : Promise<boolean>;
 }

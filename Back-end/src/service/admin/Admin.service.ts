@@ -71,18 +71,17 @@ export class AdminService implements IAminService {
         return result;
     }
 
-    async userExists(email: string): Promise<boolean> {
+    async userExists(email: string): Promise<IUser | null> {
         if(!email) throw new Error("email is required !!");
         const isUser = await this.adminRepository.findUserByEmail(email);
         
-        if(!isUser) return false;
-        return true;
+        return isUser;
     }
 
-    async findUser(email: string): Promise<IUser | null> {
-        if(!email) throw new Error("email is required !!");
+    async findUser(userId: string): Promise<IUser | null> {
+        if(!userId) throw new Error("userId is required !!");
 
-        return await this.adminRepository.findUserByEmail(email);
+        return await this.adminRepository.findUserById(userId);
     }
 
     async comparePassword(password: string, passInDb: string): Promise<boolean> {

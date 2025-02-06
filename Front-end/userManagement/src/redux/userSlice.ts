@@ -20,6 +20,13 @@ const userSlice = createSlice({
             localStorage.setItem("user",JSON.stringify(state.user));
             localStorage.setItem("isAuth",JSON.stringify(true));
         },
+        update : (state , action)=> {
+            console.log("payload : ",action.payload)
+            state.user = action.payload;
+            state.isAuthenticated = true;
+            localStorage.setItem("user",JSON.stringify(state.user));
+            localStorage.setItem("isAuth",JSON.stringify(true));
+        },
         logout : (state )=> {
             state.user = null;
             state.isAuthenticated = false;
@@ -32,9 +39,11 @@ const userSlice = createSlice({
 })
 
 
-const {login , logout} = userSlice.actions;
+const {login , logout  , update} = userSlice.actions;
 
 export  {
-    login , logout
+    login , 
+    update ,
+    logout , 
 }
 export default userSlice.reducer;

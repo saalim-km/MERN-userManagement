@@ -5,5 +5,6 @@ export interface IAdminRepository {
     deleteUserById(userId : string) : Promise<IUser | null>;
     findAllUsers() : Promise<IUser[]>;
     findUsers(user : Partial<IUser>) : Promise<IUser[]>;
+    findUserById(userId : string) : Promise<IUser | null>;
     findUserByEmail(email : string) : Promise<IUser | null>;
 }

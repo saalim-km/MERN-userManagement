@@ -3,6 +3,7 @@ import { IUser } from "../interface/User.interface.js";
 import { IUserService } from "../service/user/IUser.service.js";
 import { CreateJwt } from "../utils/createJwt.js";
 import { HttpStatus } from "../utils/statusCode.js";
+import { error } from "console";
 
 export class UserController {
     private userService : IUserService;
@@ -19,7 +20,7 @@ export class UserController {
             const newUser = await this.userService.createUser(user);
             if(!newUser) return res.status(HttpStatus.BAD_REQUEST).json({success : false , message : "No User found !!"});
 
-            return res.status(HttpStatus.OK).json({success : true , message : "user registeration successfull"});
+            return res.status(HttpStatus.OK).json({success : true , message : "user registeration successfull" , user: newUser});
         } catch (error : any) {
             console.log(error );
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({success : false , message : error.message});
@@ -43,7 +44,7 @@ export class UserController {
     
             const isMatch = await this.userService.comparePassword(password, user.password);
             if (!isMatch) {
-                console.log("ooomb myre")
+                console.log("have a good day !!")
                 return res.status(HttpStatus.UNAUTHORIZED || 400).json({success : false , message : "Password is incorrect"});
             }
     
@@ -81,10 +82,17 @@ export class UserController {
 
     public async updateUserProfile(req : Request , res : Response) {
         try {
-            const userId = req.user?.toString() || "";
-            console.log("user id kittiyada",userId);
-            // const updatedUser = await this.userService.updateUser(userId , req.body);
-            // res.status(200).json(updatedUser);
+            console.log("data from frontend",req.body);
+            console.log("data from req.user : " ,  req.user);
+
+            const userId = req.user;
+            if(!userId) {
+                throw new Error("user id is not valid");
+            }
+
+            const updatedUser = await this.userService.updateUser(userId , req.body);
+            console.log(updatedUser);
+            res.status(HttpStatus.OK).json({success : true , user : updatedUser});
         } catch (error : any) {
             console.log("eda evada vann")
             console.log(error );
@@ -95,10 +103,16 @@ export class UserController {
     public async newAccessToken(req : Request , res : Response){
         try {  
             console.log("in  controlller")
-            console.log(object)
+
+            console.log("req.body : ",req.body)
             const {refreshToken} = req.body;
-            const newAccessToken = await this.createJwt.refreshAccess(refreshToken);
-            console.log(newAccessToken);
+
+            console.log("refresh token kitti",refreshToken)
+            console.log("started creating access token");
+
+            const newAccessToken =  await this.createJwt.refreshAccess(refreshToken);
+            console.log("got new access token :)",newAccessToken);
+            res.status(HttpStatus.OK).json({success : true , token : newAccessToken});
         } catch (error : any) {
             console.log(error);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({success : false , message : error.message})

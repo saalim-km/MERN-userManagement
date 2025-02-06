@@ -1,25 +1,29 @@
-import React, { MouseEventHandler, useState } from "react";
+import React, { useState } from "react";
 import { updateUserProfile, uploadImage } from "../api/userService";
+import { update } from "../redux/userSlice";
+import { useDispatch } from "react-redux";
 
 interface Iprofile {
   userName: string;
   userEmail: string;
   profileImage?: string;
 }
+
 const ProfileInfo: React.FC<Iprofile> = ({
   userName,
   userEmail,
   profileImage,
 }) => {
+  const dispatch = useDispatch();
   const [name, setName] = useState(userName);
-  const [email] = useState(userEmail);  
+  const [email] = useState(userEmail);
   const [image, setImage] = useState(profileImage);
   const [nameError, setNameError] = useState("");
   const [imageError, setImageError] = useState("");
-  console.log(`profile iamge ${profileImage}`);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    console.log("value vann : ", value);
     const nameRegex = /^[a-zA-Z\s]*$/;
 
     if (nameRegex.test(value)) {
@@ -47,31 +51,44 @@ const ProfileInfo: React.FC<Iprofile> = ({
     }
   };
 
-  const handleSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if(image){
+    try {
+      console.log("handlesubmit function click cheyth");
+      if (image) {
         const data = new FormData();
         data.append("file", image);
         data.append("upload_preset", "olxProducts");
         data.append("cloud_name", "deh2nuqeb");
 
-        try {
-            const imageUrl : string = await uploadImage(data);
-            console.log(imageUrl);
-            const userData = {
-                profileImage : imageUrl,
-                name : name,
-            }
+        console.log("form submission start aaayi");
+        if (image) {
+          const imageUrl: string = await uploadImage(data);
+          console.log(imageUrl);
 
-            const res = updateUserProfile(userData);
-            console.log("update cheyth kittiya response : ",res);
-        } catch (error) {
-            console.log(error)
+          const userData = {
+            profileImage: imageUrl,
+            name: name,
+          };
+
+          console.log("update function vilich");
+          const res = await updateUserProfile(userData);
+          console.log("update cheyth kittiya response : ", res);
+          dispatch(update(res))
         }
+      } else {
+        const userData = {
+          name: name,
+        };
+        const res = await updateUserProfile(userData);
+        console.log("response kitti ", res);
+        dispatch(update(res));
+      }
+      console.log(name, email, image);
+    } catch (error) {
+      console.log(error);
     }
-    console.log(name , email , image);
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -94,7 +111,7 @@ const ProfileInfo: React.FC<Iprofile> = ({
           ) : (
             <div className="w-24 h-24 flex items-center justify-center rounded-full border-2 border-black">
               <h1 className="text-4xl font-bold">
-                {userName.split("")[1].toUpperCase()}
+                {userName.split("")[0].toUpperCase()}
               </h1>
             </div>
           )}
@@ -143,9 +160,12 @@ const ProfileInfo: React.FC<Iprofile> = ({
 
         {/* Save Button */}
         <form onSubmit={handleSubmit}>
-            <button type="submit" className="cursor-pointer w-full bg-black text-white py-2 rounded-md font-medium hover:bg-gray-900 transition">
+          <button
+            type="submit"
+            className="cursor-pointer w-full bg-black text-white py-2 rounded-md font-medium hover:bg-gray-900 transition"
+          >
             Save Changes
-            </button>
+          </button>
         </form>
       </div>
     </div>

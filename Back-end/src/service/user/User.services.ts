@@ -2,6 +2,7 @@ import { IUser } from "../../interface/User.interface.js";
 import { IUserService } from "./IUser.service.js";
 import { IUserRepository } from "../../repository/user/IUser.repository.js";
 import { Bcrypt } from "../../utils/bcrypt.js";
+import { Types } from "mongoose";
 
 export class UserService implements IUserService {
 
@@ -42,7 +43,7 @@ export class UserService implements IUserService {
         return isUser;
     }
 
-    async updateUser(userId: string, user: Partial<IUser>): Promise<IUser | null> {
+    async updateUser(userId: Types.ObjectId, user: Partial<IUser>): Promise<IUser | null> {
         if(!userId) {
             throw new Error("id is missing !!");
         }
@@ -85,7 +86,7 @@ export class UserService implements IUserService {
         return true;
     }
 
-    async changePassword(userId: string, newPassword: string): Promise<IUser | null> {
+    async changePassword(userId: Types.ObjectId, newPassword: string): Promise<IUser | null> {
         if(!userId) {
             throw new Error("id is missing !!");
         }

@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import Header from '../components/Header'
+import Header from '../../components/Header'
 import { useSelector } from 'react-redux'
-import { RootState } from '../redux/store';
-import Hero from '../components/Hero';
+import { RootState } from '../../redux/store';
+import Hero from '../../components/Hero';
 
 const Home = () => {
     const userData = useSelector((state : RootState )=> state.user);
@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <div>
       <Header/>
-      <Hero username={userData.user.userName} email={userData.user.email}/>
+      <Hero username={userData.user.userName} email={userData.user.email} profileImage={userData.user.profileImg}/>
     </div>
   )
 }

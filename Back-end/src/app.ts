@@ -1,5 +1,5 @@
 import express , {Application , Request , Response} from "express";
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { UserRoute } from "./route/User.route.js";
@@ -16,7 +16,7 @@ import { AdminRepository } from "./repository/admin/Admin.repository.js";
 
 declare module "express-serve-static-core" {
     interface Request {
-      user?: IUser & Document;
+      user?: Types.ObjectId
     }
 }
 
