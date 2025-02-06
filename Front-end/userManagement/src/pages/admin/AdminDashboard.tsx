@@ -5,7 +5,7 @@ import AdminLogout from "../../components/AdminLogout";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { logout } from "../../redux/adminSlice";
-import { fetchUsers } from "../../api/adminService";
+import { deleteUser, fetchUsers } from "../../api/adminService";
 import AddUser from "../../components/AddUser";
 
 interface User {
@@ -45,8 +45,10 @@ const AdminDashboard = () => {
     navigate(`/admin-edit/${user._id}`);
   };
 
-  const handleDeleteUser = (userId: string) => {
-    
+  const handleDeleteUser = async (userId: string) => {
+    console.log(userId)
+    const deleteRes = await deleteUser(userId);
+    setUsers(deleteRes);
   };
 
   const filteredUsers = users.filter((user) =>

@@ -65,3 +65,14 @@ export const editUser = async(userData , userid) => {
         handleError(error);
     }
 }
+
+export const deleteUser = async(userId)=> {
+    try {
+        const res = await adminAxiosInstance.delete(`/user/${userId}`)
+        console.log("res from deleteuser : ",res);
+        showSuccessToast(res.data.message)
+        return res.data.users;
+    } catch (error) {
+        handleError(error)
+    }
+}

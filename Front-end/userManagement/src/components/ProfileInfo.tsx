@@ -74,7 +74,7 @@ const ProfileInfo: React.FC<Iprofile> = ({
           console.log("update function vilich");
           const res = await updateUserProfile(userData);
           console.log("update cheyth kittiya response : ", res);
-          dispatch(update(res))
+          dispatch(update(res))   
         }
       } else {
         const userData = {

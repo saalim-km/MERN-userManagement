@@ -103,6 +103,7 @@ const AddUserPage = () => {
           console.log(`Confirm password removed: ${confirmPassword}`);
           const signupRes = await userRegister(userData);
           console.log("Signup result from API service:", signupRes);
+          navigate("/admin")
       } catch (error) {
         handleError(error);
       }

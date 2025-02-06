@@ -91,7 +91,7 @@ export class UserController {
             }
 
             const updatedUser = await this.userService.updateUser(userId , req.body);
-            console.log(updatedUser);
+            console.log("user updated : ",updatedUser);
             res.status(HttpStatus.OK).json({success : true , user : updatedUser});
         } catch (error : any) {
             console.log("eda evada vann")

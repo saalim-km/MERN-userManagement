@@ -70,11 +70,15 @@ export class AdminController {
 
     public deleteUser = async (req: Request, res: Response) => {
         try {
-            const userId: string = req.params.id;
+            console.log("hi evda ethi")
+            console.log(req.params);
+            const {userId} = req.params;
             const deletedUser = await this.adminService.deleteUser(userId);
-            res.status(200).json(deletedUser);
+            const users = await this.adminService.getUsers();
+            console.log(deletedUser)
+            res.status(HttpStatus.OK).json({message : "User Deleted" , deletedUser , users : users});
         } catch (error) {
-            res.status(400).json({ message: "an error occured please try agian later" });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "an error occured please try agian later" });
         }
     };
 

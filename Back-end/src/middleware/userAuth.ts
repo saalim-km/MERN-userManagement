@@ -19,7 +19,6 @@ export class UserAuth {
       console.log("auth header vann : ",authHeader)
       if (!authHeader) {
         res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "No access token provided" });
-
       } else {
         const token = authHeader.split(" ")[1];
         const decoded = jwt.decode(token) as JwtPayload | null;

@@ -61,7 +61,7 @@ const updateUserProfile = async (userData: Partial<UpdateUser>) => {
     }
 
     console.log(newData)
-    showSuccessToast("Profile updated.")
+    showSuccessToast("Profile updated.",newData)
     return newData;
   } catch (error) {
     handleError(error);
